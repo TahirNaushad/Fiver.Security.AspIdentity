@@ -1,0 +1,27 @@
+﻿@model List<Fiver.Security.AspIdentity.Models.Security.AppIdentityUser>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Fail.Count</th>
+            <th>Email Confirmed?</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.UserName</td>
+                <td>@item.Email</td>
+                <td>@item.Age</td>
+                <td>@item.AccessFailedCount</td>
+                <td>@item.EmailConfirmed</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+Go to <a asp-controller="Home" asp-action="Index">Home</a>

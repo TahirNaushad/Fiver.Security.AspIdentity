@@ -1,6 +1,8 @@
 ﻿using Fiver.Security.AspIdentity.Models.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fiver.Security.AspIdentity.Controllers
@@ -92,6 +94,17 @@ namespace Fiver.Security.AspIdentity.Controllers
         public IActionResult Access()
         {
             return View();
+        }
+
+        #endregion
+
+        #region " Users "
+
+        [Authorize]
+        public IActionResult ListUsers()
+        {
+            var viewModel = this.userManager.Users.ToList();
+            return View(viewModel);
         }
 
         #endregion
