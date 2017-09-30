@@ -1,34 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Fiver.Security.AspIdentity.Models.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Fiver.Security.AspIdentity
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        private IConfiguration configuration;
+
+        public Startup(IConfiguration configuration)
         {
+            this.configuration = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void ConfigureServices(
+            IServiceCollection services)
+        {
+            services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlServer(configuration["DB_CONN"]));
+
+            services.AddIdentity<AppIdentityUser, AppIdentityRole>()
+                    .AddEntityFrameworkStores<AppIdentityDbContext>()
+                    .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // password settings
+
+                // lockout settings
+
+                // user settings
+
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Security/Login";
+                options.LogoutPath = "/Security/Logout";
+                options.AccessDeniedPath = "/Security/Access";
+                options.SlidingExpiration = true;
+                options.Cookie = new CookieBuilder
+                {
+                    //Domain = "",
+                    HttpOnly = true,
+                    Name = ".Fiver.Security.Cookie",
+                    Path = "/",
+                    SameSite = SameSiteMode.Lax,
+                    SecurePolicy = CookieSecurePolicy.SameAsRequest
+                };
+            });
+            
+            services.AddMvc();
+        }
+
+        public void Configure(
+            IApplicationBuilder app, 
+            IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            app.UseAuthentication();
+
+            app.UseMvcWithDefaultRoute();
         }
     }
 }

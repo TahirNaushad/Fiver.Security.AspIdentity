@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div>
+        @RenderBody()
+
+        <hr />
+        <footer>
+            @if (Context.User.Identity.IsAuthenticated)
+            {
+                <p>
+                    @Context.User.Identity.Name (<a asp-controller="Security" asp-action="Logout">Logout</a>)
+                </p>
+            }
+            else
+            {
+                <p>
+                    <a asp-controller="Security" asp-action="Login">Signin</a>
+                    |
+                    <a asp-controller="Security" asp-action="Register">Register</a>
+                </p>
+            }
+        </footer>
+    </div>
+</body>
+</html>

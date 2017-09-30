@@ -1,0 +1,9 @@
+﻿@model Fiver.Security.AspIdentity.Models.Security.LoginInputModel
+
+<h3>Login</h3>
+
+<form asp-controller="Security" asp-action="Login" method="post">
+    <input type="text" asp-for="Username" placeholder="Username" />
+    <input type="password" asp-for="Password" placeholder="Password" />
+    <input type="submit" value="Login" />
+</form>

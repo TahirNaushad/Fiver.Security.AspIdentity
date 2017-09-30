@@ -1,0 +1,14 @@
+﻿@model Fiver.Security.AspIdentity.Models.Security.RegisterInputModel
+
+<h3>Register</h3>
+
+<form asp-controller="Security" asp-action="Register" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <input type="text" asp-for="UserName" placeholder="Username" /><br />
+    <input type="password" asp-for="Password" placeholder="Password" /><br />
+    <input type="password" asp-for="ConfirmPassword" placeholder="Confirm Password" /><br />
+    <input type="text" asp-for="Email" placeholder="Email" /><br />
+    <input type="text" asp-for="Age" placeholder="Age" /><br />
+    <input type="submit" value="Register" />
+</form>
