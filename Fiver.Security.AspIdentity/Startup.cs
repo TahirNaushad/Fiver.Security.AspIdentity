@@ -1,4 +1,5 @@
-﻿using Fiver.Security.AspIdentity.Models.Security;
+﻿using Fiver.Security.AspIdentity.Lib;
+using Fiver.Security.AspIdentity.Models.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -43,7 +44,7 @@ namespace Fiver.Security.AspIdentity
 
                 options.User.RequireUniqueEmail = true;
 
-                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             });
 
@@ -63,7 +64,9 @@ namespace Fiver.Security.AspIdentity
                     SecurePolicy = CookieSecurePolicy.SameAsRequest
                 };
             });
-            
+
+            services.AddTransient<IEmailSender, EmailSender>();
+
             services.AddMvc();
         }
 
