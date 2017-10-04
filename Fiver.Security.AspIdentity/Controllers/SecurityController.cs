@@ -111,7 +111,10 @@ namespace Fiver.Security.AspIdentity.Controllers
                     values: new { userId = user.Id, code = confrimationCode },
                     protocol: Request.Scheme);
 
-                await this.emailSender.SendConfirmationEmailAsync(user.Email, callbackurl);
+                await this.emailSender.SendEmailAsync(
+                    email: user.Email,
+                    subject: "Confirm Email",
+                    message: callbackurl);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -153,7 +156,9 @@ namespace Fiver.Security.AspIdentity.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
 
             var result = await this.userManager.ConfirmEmailAsync(user, code);
-            //return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (result.Succeeded)
+                return View("ConfirmEmail");
+
             return RedirectToAction("Index", "Home");
         }
 
