@@ -163,5 +163,90 @@ namespace Fiver.Security.AspIdentity.Controllers
         }
 
         #endregion
+
+        #region " Forgot Password "
+
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return View();
+
+            var user = await this.userManager.FindByEmailAsync(email);
+            if (user == null)
+                return RedirectToAction("ForgotPasswordEmailSent");
+
+            if (!await this.userManager.IsEmailConfirmedAsync(user))
+                return RedirectToAction("ForgotPasswordEmailSent");
+
+            var confrimationCode =
+                    await this.userManager.GeneratePasswordResetTokenAsync(user);
+
+            var callbackurl = Url.Action(
+                controller: "Security",
+                action: "ResetPassword",
+                values: new { userId = user.Id, code = confrimationCode },
+                protocol: Request.Scheme);
+
+            await this.emailSender.SendEmailAsync(
+                email: user.Email,
+                subject: "Reset Password",
+                message: callbackurl);
+
+            return RedirectToAction("ForgotPasswordEmailSent");
+        }
+
+        public IActionResult ForgotPasswordEmailSent()
+        {
+            return View();
+        }
+
+        #endregion
+
+        #region " Reset Password "
+
+        public IActionResult ResetPassword(string userId, string code)
+        {
+            if (userId == null || code == null)
+                throw new ApplicationException("Code must be supplied for password reset.");
+
+            var model = new ResetPasswordViewModel { Code = code };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await this.userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return RedirectToAction("ResetPasswordConfirm");
+
+            var result = await this.userManager.ResetPasswordAsync(
+                                        user, model.Code, model.Password);
+            if (result.Succeeded)
+                return RedirectToAction("ResetPasswordConfirm");
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
+           
+            return View(model);
+        }
+
+        public IActionResult ResetPasswordConfirm()
+        {
+            return View();
+        }
+
+        #endregion
     }
 }
