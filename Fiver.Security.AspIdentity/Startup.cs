@@ -1,5 +1,5 @@
-﻿using Fiver.Security.AspIdentity.Lib;
-using Fiver.Security.AspIdentity.Models.Security;
+﻿using Fiver.Security.AspIdentity.Services.Email;
+using Fiver.Security.AspIdentity.Services.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -52,7 +52,7 @@ namespace Fiver.Security.AspIdentity
             {
                 options.LoginPath = "/Security/Login";
                 options.LogoutPath = "/Security/Logout";
-                options.AccessDeniedPath = "/Security/Access";
+                options.AccessDeniedPath = "/Security/AccessDenied";
                 options.SlidingExpiration = true;
                 options.Cookie = new CookieBuilder
                 {

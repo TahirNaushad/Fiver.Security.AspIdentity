@@ -2,7 +2,7 @@
 
 namespace Fiver.Security.AspIdentity.Models.Security
 {
-    public class RegisterInputModel
+    public class RegisterViewModel
     {
         [Required]
         public string UserName { get; set; }

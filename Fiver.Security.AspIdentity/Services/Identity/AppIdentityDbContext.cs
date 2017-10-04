@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Fiver.Security.AspIdentity.Models.Security
+namespace Fiver.Security.AspIdentity.Services.Identity
 {
     public class AppIdentityDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, string>
     {

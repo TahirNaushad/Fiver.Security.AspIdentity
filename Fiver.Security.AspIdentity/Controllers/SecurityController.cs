@@ -1,10 +1,9 @@
-﻿using Fiver.Security.AspIdentity.Lib;
-using Fiver.Security.AspIdentity.Models.Security;
-using Microsoft.AspNetCore.Authorization;
+﻿using Fiver.Security.AspIdentity.Models.Security;
+using Fiver.Security.AspIdentity.Services.Email;
+using Fiver.Security.AspIdentity.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fiver.Security.AspIdentity.Controllers
@@ -29,7 +28,7 @@ namespace Fiver.Security.AspIdentity.Controllers
 
         #endregion
 
-        #region " Login "
+        #region " Login / Logout / Access Denied "
 
         public IActionResult Login()
         {
@@ -38,40 +37,41 @@ namespace Fiver.Security.AspIdentity.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginInputModel inputModel)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(inputModel);
+                return View(model);
 
-            var user = await this.userManager.FindByNameAsync(inputModel.Username);
+            var user = await this.userManager.FindByNameAsync(model.Username);
             if (user != null)
             {
                 if (!await this.userManager.IsEmailConfirmedAsync(user))
                 {
                     ModelState.AddModelError(string.Empty,
                               "Confirm your email please");
-                    return View(inputModel);
+                    return View(model);
                 }
             }
 
             var result = await this.signInManager.PasswordSignInAsync(
-                inputModel.Username, inputModel.Password, isPersistent: false, lockoutOnFailure: false);
+                model.Username, model.Password, isPersistent: false, lockoutOnFailure: false);
 
             if (result.Succeeded)
                 return RedirectToAction("Index", "Home");
 
             ModelState.AddModelError(string.Empty, "Login Failed");
-            return View(inputModel);
+            return View(model);
         }
-
-        #endregion
-
-        #region " Logout "
-
+        
         public async Task<IActionResult> Logout()
         {
             await this.signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         #endregion
@@ -85,19 +85,19 @@ namespace Fiver.Security.AspIdentity.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterInputModel inputModel)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(inputModel);
+                return View(model);
 
             var user = new AppIdentityUser
             {
-                UserName = inputModel.UserName,
-                Email = inputModel.Email,
-                Age = inputModel.Age
+                UserName = model.UserName,
+                Email = model.Email,
+                Age = model.Age
             };
 
-            var result = await this.userManager.CreateAsync(user, inputModel.Password);
+            var result = await this.userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
                 //await this.signInManager.SignInAsync(user, isPersistent: false);
@@ -119,33 +119,9 @@ namespace Fiver.Security.AspIdentity.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            return View(inputModel);
+            return View(model);
         }
-
-        #endregion
-
-        #region " Access "
-
-        public IActionResult Access()
-        {
-            return View();
-        }
-
-        #endregion
-
-        #region " Users "
-
-        [Authorize]
-        public IActionResult ListUsers()
-        {
-            var viewModel = this.userManager.Users.ToList();
-            return View(viewModel);
-        }
-
-        #endregion
-
-        #region " Email Confirmation (after Registration) "
-
+        
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
