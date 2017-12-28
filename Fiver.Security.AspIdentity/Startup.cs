@@ -24,9 +24,9 @@ namespace Fiver.Security.AspIdentity
             IServiceCollection services)
         {
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(configuration["DB_CONN"]));
+                options.UseNpgsql(configuration["ConnectionStrings:conexao"]));
 
-            services.AddIdentity<AppIdentityUser, AppIdentityRole>()
+            services.AddIdentity<User, Role>()
                     .AddEntityFrameworkStores<AppIdentityDbContext>()
                     .AddDefaultTokenProviders();
 
